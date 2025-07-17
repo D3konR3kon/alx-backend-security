@@ -26,6 +26,7 @@ class Command(BaseCommand):
         unblock = options['unblock']
         reason = options.get('reason', '')
 
+
         if not self.is_valid_ip(ip_address):
             raise CommandError(f'Invalid IP address: {ip_address}')
 
@@ -60,7 +61,7 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.WARNING(f'IP {ip_address} is already blocked')
                 )
-
+                
                 if reason and blocked_ip.reason != reason:
                     blocked_ip.reason = reason
                     blocked_ip.save()
@@ -78,6 +79,7 @@ class Command(BaseCommand):
             blocked_ip.delete()
 
             cache.delete(f"blocked_ip_{ip_address}")
+            
             self.stdout.write(
                 self.style.SUCCESS(f'Successfully unblocked IP: {ip_address}')
             )
@@ -88,3 +90,4 @@ class Command(BaseCommand):
             )
         except Exception as e:
             raise CommandError(f'Error unblocking IP {ip_address}: {str(e)}')
+
