@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limit Exceeded - IP Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        .error-container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #dc3545;
+        }
+        .error-icon {
+            font-size: 48px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .countdown {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .rate-limit-info {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .tips {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .tips h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .tips ul {
+            color: #666;
+            line-height: 1.6;
+        }
+        .tips li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h1>Rate Limit Exceeded</h1>
+        
+        <div class="error-message">
+            <p>You have exceeded the rate limit for this resource. Please wait before making additional requests.</p>
+        </div>
+        
+        <div class="rate-limit-info">
+            <strong>Rate Limit Policy:</strong><br>
+            • Anonymous users: 5 requests per minute<br>
+            • Authenticated users: 10 requests per minute<br>
+            • Login attempts: 5 attempts per minute<br>
+            • Sensitive actions: 3 requests per minute
+        </div>
+        
+        <div class="countdown">
+            <div id="countdown-timer">Please wait {{ retry_after }} seconds before trying again.</div>
+        </div>
+        
+        <a href="javascript:history.back()" class="btn">Go Back</a>
+        <a href="{% url 'home' %}" class="btn">Home</a>
+        
+        <div class="tips">
+            <h3>💡 Tips to avoid rate limiting:</h3>
+            <ul>
+                <li>Wait between requests instead of rapid-fire clicking</li>
+                <li>Log in to get higher rate limits (10/min vs 5/min)</li>
+                <li>Use bookmarks instead of repeatedly visiting the same page</li>
+                <li>Consider using our API with proper throttling for automated access</li>
+                <li>Clear your browser cache if you're experiencing issues</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Countdown timer
+        let timeLeft = retry_after;
+        const countdownElement = document.getElementById('countdown-timer');
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                countdownElement.innerHTML = "You can now try again!";
+                clearInterval(timer);
+                
+                // Show a retry button
+                const retryBtn = document.createElement('a');
+                retryBtn.href = 'javascript:history.back()';
+                retryBtn.className = 'btn';
+                retryBtn.textContent = 'Try Again';
+                retryBtn.style.backgroundColor = '#28a745';
+                countdownElement.appendChild(document.createElement('br'));
+                countdownElement.appendChild(retryBtn);
+            } else {
+                countdownElement.innerHTML = `Please wait ${timeLeft} seconds before trying again.`;
+            }
+        }, 1000);
+        
+        // Auto-refresh after timer expires
+        setTimeout(() => {
+            window.location.reload();
+        },  retry_after  * 1000 + 1000);
+    </script>
+</body>
+</html>
