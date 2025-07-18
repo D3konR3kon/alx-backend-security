@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_ratelimit',
     'ip_tracking'
 ]
 
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'alx_backend_security.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -152,3 +153,18 @@ LOGGING = {
         },
     },
 }
+
+# Rate Limiting Configuration
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = 'default'
+
+# Rate limit settings
+RATELIMIT_SETTINGS = {
+    'AUTHENTICATED_USER_RATE': '10/m',  # 10 requests per minute for authenticated users
+    'ANONYMOUS_USER_RATE': '5/m',       # 5 requests per minute for anonymous users
+    'LOGIN_RATE': '5/m',                # 5 login attempts per minute
+    'SENSITIVE_ACTION_RATE': '3/m',     # 3 requests per minute for sensitive actions
+}
+
+# Custom rate limit exceeded view
+RATELIMIT_VIEW = 'ip_tracking.views.rate_limit_exceeded'
