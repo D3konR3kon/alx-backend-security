@@ -154,6 +154,67 @@ LOGGING = {
     },
 }
 
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0' 
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Alternative: Using RabbitMQ
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# CELERY_RESULT_BACKEND = 'rpc://'
+
+# Celery Task Serialization
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Celery Timezone
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+
+# Celery Task Configuration
+CELERY_TASK_SOFT_TIME_LIMIT = 60 * 30 
+CELERY_TASK_TIME_LIMIT = 60 * 60     
+CELERY_TASK_ALWAYS_EAGER = False 
+
+# Celery Worker Configuration
+CELERY_WORKER_CONCURRENCY = 2
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 50
+
+# Celery Beat (Scheduler) Configuration
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Result Backend Settings
+CELERY_RESULT_EXPIRES = 60 * 60 * 24 
+
+# Task Routes (optional - route specific tasks to specific queues)
+CELERY_TASK_ROUTES = {
+    'ip_tracking.tasks.detect_suspicious_ips': {'queue': 'security'},
+    'ip_tracking.tasks.cleanup_old_suspicious_ips': {'queue': 'maintenance'},
+    'ip_tracking.tasks.generate_security_report': {'queue': 'reports'},
+}
+
+# Queue Configuration
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+CELERY_TASK_QUEUES = {
+    'default': {
+        'exchange': 'default',
+        'routing_key': 'default',
+    },
+    'security': {
+        'exchange': 'security',
+        'routing_key': 'security',
+    },
+    'maintenance': {
+        'exchange': 'maintenance',
+        'routing_key': 'maintenance',
+    },
+    'reports': {
+        'exchange': 'reports',
+        'routing_key': 'reports',
+    },
+}
+
+
 # Rate Limiting Configuration
 RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = 'default'
